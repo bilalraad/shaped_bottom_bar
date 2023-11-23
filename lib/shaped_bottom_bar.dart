@@ -4,29 +4,32 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:shaped_bottom_bar/models/shaped_item_object.dart';
-import 'package:shaped_bottom_bar/utils/arrays.dart';
-import 'package:shaped_bottom_bar/widgets/circle_shape.dart';
+import 'package:shaped_bottom_bar/utils/enums.dart';
 import 'package:shaped_bottom_bar/widgets/custom_shape_widget.dart';
-import 'package:shaped_bottom_bar/widgets/diamond_shape.dart';
-import 'package:shaped_bottom_bar/widgets/hexagon_shape.dart';
-import 'package:shaped_bottom_bar/widgets/octagon_shape.dart';
-import 'package:shaped_bottom_bar/widgets/pentagon_shape.dart';
-import 'package:shaped_bottom_bar/widgets/rhombus_shape.dart';
-import 'package:shaped_bottom_bar/widgets/rotated_hexagon.dart';
-import 'package:shaped_bottom_bar/widgets/royal_shape.dart';
+
 import 'package:shaped_bottom_bar/widgets/shaped_bottom_bar_item.dart';
-import 'package:shaped_bottom_bar/widgets/square.dart';
-import 'package:shaped_bottom_bar/widgets/star_shape.dart';
-import 'package:shaped_bottom_bar/widgets/triangle_shape.dart';
+import 'package:shaped_bottom_bar/widgets/shapes/circle_shape.dart';
+import 'package:shaped_bottom_bar/widgets/shapes/diamond_shape.dart';
+import 'package:shaped_bottom_bar/widgets/shapes/hexagon_shape.dart';
+import 'package:shaped_bottom_bar/widgets/shapes/octagon_shape.dart';
+import 'package:shaped_bottom_bar/widgets/shapes/pentagon_shape.dart';
+import 'package:shaped_bottom_bar/widgets/shapes/rhombus_shape.dart';
+import 'package:shaped_bottom_bar/widgets/shapes/rotated_hexagon.dart';
+import 'package:shaped_bottom_bar/widgets/shapes/royal_shape.dart';
+import 'package:shaped_bottom_bar/widgets/shapes/star_shape.dart';
+import 'package:shaped_bottom_bar/widgets/shapes/triangle_shape.dart';
+import 'package:shaped_bottom_bar/widgets/shapes/square_shape.dart';
 
 import 'widgets/animated_shape.dart';
+export 'utils/enums.dart';
+export 'models/shaped_item_object.dart';
 
 ///The size of the bottom bar: default 70
 const double shapedBottomBarSize = 70;
 
 ///Main widget of shaped bottom bar
 ///required [listItems] the list of [ShapedItemObject] that will be shown
-///[onItemChanged] function that will be trigerred everytime the current item changes
+///[onItemChanged] function that will be triggered every time the current item changes
 ///Other attributes are optional
 ///
 ///By default the bottom bar will be rendered without shape.
@@ -43,22 +46,17 @@ class ShapedBottomBar extends StatefulWidget {
     this.shape = ShapeType.none,
     this.selectedItemIndex = 0,
     this.shapeColor = Colors.blue,
-    this.iconsColor = Colors.black,
-    this.textStyle = const TextStyle(color: Colors.black),
-    this.selectedIconColor = Colors.white,
+    this.unselectedIconColor = Colors.black,
+    this.selectedIconColor = Colors.blue,
+    this.textStyle = const TextStyle(),
     this.bottomBarTopColor = Colors.white,
     this.backgroundColor = Colors.blue,
     this.customShape,
-    this.animationType = ANIMATION_TYPE.none,
+    this.animationType = AnimationType.none,
     this.with3dEffect = false,
   }) : super(key: key) {
-    if (withRoundCorners) {
-      assert(cornerRadius != null);
-    }
-
-    if (shape == ShapeType.custom) {
-      assert(customShape != null);
-    }
+    if (withRoundCorners) assert(cornerRadius != null);
+    if (shape == ShapeType.custom) assert(customShape != null);
 
     assert(listItems.isNotEmpty);
   }
@@ -77,7 +75,7 @@ class ShapedBottomBar extends StatefulWidget {
   //Colors
   final Color shapeColor;
   final Color backgroundColor;
-  final Color iconsColor;
+  final Color unselectedIconColor;
   final Color selectedIconColor;
   final TextStyle textStyle;
   final Color bottomBarTopColor;
@@ -87,7 +85,7 @@ class ShapedBottomBar extends StatefulWidget {
   ///
   final CustomPaint? customShape;
 
-  ///aimation that will be set when navigating between navigation bar items
+  ///animation that will be set when navigating between navigation bar items
   ///possible values
   ///```dart
   ///[
@@ -98,7 +96,7 @@ class ShapedBottomBar extends StatefulWidget {
   ///]
   ///```
   ///
-  final ANIMATION_TYPE animationType;
+  final AnimationType animationType;
 
   ///Whether the selected shape will be rendered with 3D effects
   ///by default it's false
@@ -141,24 +139,17 @@ class _ShapedBottomBarState extends State<ShapedBottomBar>
     selectedIndex = widget.selectedItemIndex;
 
     slideController = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _offsetAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(0, 1.5),
-    ).animate(
-      CurvedAnimation(
-        parent: slideController!,
-        curve: Curves.ease,
-      ),
+    _offsetAnimation =
+        Tween<Offset>(begin: Offset.zero, end: const Offset(0, 1.5)).animate(
+      CurvedAnimation(parent: slideController!, curve: Curves.ease),
     );
 
     rotateController = AnimationController(
       vsync: this,
-      duration: const Duration(
-        milliseconds: 300,
-      ),
+      duration: const Duration(milliseconds: 200),
     );
 
     generateListOfWidgets();
@@ -168,8 +159,17 @@ class _ShapedBottomBarState extends State<ShapedBottomBar>
   Widget build(BuildContext context) {
     return Container(
       width: widget.width ?? MediaQuery.of(context).size.width,
-      height: widget.height,
-      color: widget.bottomBarTopColor,
+      height: widget.height * 0.75,
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            spreadRadius: 10,
+          ),
+        ],
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -183,34 +183,20 @@ class _ShapedBottomBarState extends State<ShapedBottomBar>
   List<Widget> renderBarItems() {
     List<Widget> bottomBarItems = [];
     List<Widget> renderingItems = [];
-    for (var index = 0; index < bottomBarWidgets.length; index++) {
-      var item = bottomBarWidgets[index];
+    for (int index = 0; index < bottomBarWidgets.length; index++) {
+      final item = bottomBarWidgets[index];
       if (index == selectedIndex) {
-        if (bottomBarItems.isNotEmpty) {
-          renderingItems.addAll(bottomBarItems);
-        }
-        renderingItems.add(
-          Expanded(
-            flex: 1,
-            child: renderSelectedItem(item),
-          ),
-        );
+        if (bottomBarItems.isNotEmpty) renderingItems.addAll(bottomBarItems);
+        renderingItems.add(Expanded(flex: 1, child: renderSelectedItem(item)));
         bottomBarItems.clear();
       } else {
         bottomBarItems.add(
-          Expanded(
-            flex: 1,
-            child: renderClickableWidget(
-              index,
-              item,
-            ),
-          ),
+          Expanded(flex: 1, child: renderClickableWidget(index, item)),
         );
       }
     }
-    if (bottomBarItems.isNotEmpty) {
-      renderingItems.addAll(bottomBarItems);
-    }
+    if (bottomBarItems.isNotEmpty) renderingItems.addAll(bottomBarItems);
+
     return renderingItems;
   }
 
@@ -223,9 +209,7 @@ class _ShapedBottomBarState extends State<ShapedBottomBar>
   ///return a clickable [Widget] with a function that updates the current selected  item
   Widget renderClickableWidget(int index, Widget item) {
     return InkWell(
-      onTap: () {
-        onItemSelected(index);
-      },
+      onTap: () => onItemSelected(index),
       child: Container(
         height: (widget.height * 0.75),
         color: widget.backgroundColor,
@@ -243,14 +227,10 @@ class _ShapedBottomBarState extends State<ShapedBottomBar>
   /// has no return value
   void onItemSelected(int position) {
     switch (widget.animationType) {
-      case ANIMATION_TYPE.fade:
-        setState(() {
-          opacity = 0;
-        });
+      case AnimationType.fade:
+        setState(() => opacity = 0);
         Timer(
-          const Duration(
-            milliseconds: 200,
-          ),
+          const Duration(milliseconds: 100),
           () {
             widget.onItemChanged(position);
             setState(
@@ -260,26 +240,16 @@ class _ShapedBottomBarState extends State<ShapedBottomBar>
               },
             );
             Timer(
-              const Duration(
-                milliseconds: 200,
-              ),
-              () {
-                setState(
-                  () {
-                    opacity = 1;
-                  },
-                );
-              },
+              const Duration(milliseconds: 100),
+              () => setState(() => opacity = 1),
             );
           },
         );
         break;
-      case ANIMATION_TYPE.slideVertically:
-        slideController!.animateTo(1.5);
+      case AnimationType.slideVertically:
+        slideController!.animateTo(0.4);
         Timer(
-          const Duration(
-            milliseconds: 200,
-          ),
+          const Duration(milliseconds: 100),
           () {
             widget.onItemChanged(position);
             setState(() {
@@ -290,7 +260,7 @@ class _ShapedBottomBarState extends State<ShapedBottomBar>
           },
         );
         break;
-      case ANIMATION_TYPE.rotate:
+      case AnimationType.rotate:
         widget.onItemChanged(position);
         setState(
           () {
@@ -301,9 +271,7 @@ class _ShapedBottomBarState extends State<ShapedBottomBar>
         rotateController!.forward();
         Timer(
           const Duration(milliseconds: 300),
-          () {
-            rotateController!.reset();
-          },
+          rotateController!.reset,
         );
         break;
       default:
@@ -317,10 +285,10 @@ class _ShapedBottomBarState extends State<ShapedBottomBar>
   }
 
   ///render the selected widget
-  ///based on the parameter [shape] it render the apporpriate shape
+  ///based on the parameter [shape] it render the appropriate shape
   ///if shape equals to [ShapeType.none] the selected item will be just a colored icon with the color is [selectedIconColor]
   ///
-  ///the widget result will be wraped with [AnimatedShape] widget with the selected animation [widget.animationType]
+  ///the widget result will be warped with [AnimatedShape] widget with the selected animation [widget.animationType]
   ///
   ///[baseWidget] : the selected widget that will be wrapped  with a shape.
   ///
@@ -343,7 +311,7 @@ class _ShapedBottomBarState extends State<ShapedBottomBar>
           size: widget.height,
         );
         break;
-      case ShapeType.triange:
+      case ShapeType.triangle:
         shapedWidget = TriangleShape(
           child: baseWidget,
           background: widget.shapeColor,
@@ -351,7 +319,7 @@ class _ShapedBottomBarState extends State<ShapedBottomBar>
           render3dEffect: widget.with3dEffect,
         );
         break;
-      case ShapeType.hexagone:
+      case ShapeType.hexagon:
         shapedWidget = HexagonShape(
           child: baseWidget,
           background: widget.shapeColor,
@@ -423,6 +391,7 @@ class _ShapedBottomBarState extends State<ShapedBottomBar>
         break;
     }
     return Stack(
+      clipBehavior: Clip.none,
       children: [
         Align(
           alignment: Alignment.bottomCenter,
@@ -431,43 +400,42 @@ class _ShapedBottomBarState extends State<ShapedBottomBar>
             color: widget.backgroundColor,
           ),
         ),
-        AnimatedShape(
-          animationType: widget.animationType,
-          animationValue: opacity,
-          animationOffset: _offsetAnimation,
-          animationController: rotateController,
-          shape: shapedWidget,
-        )
+        Positioned(
+          top: -15,
+          left: 0,
+          right: 0,
+          child: SizedBox(
+            height: (widget.height * 0.75),
+            child: AnimatedShape(
+              animationType: widget.animationType,
+              animationValue: opacity,
+              animationOffset: _offsetAnimation,
+              animationController: rotateController,
+              shape: shapedWidget,
+            ),
+          ),
+        ),
       ],
     );
   }
 
   ///Generate list of [ShapedBottomBarItem] objects, used in rendering the shaped bottom bar
-  ///iterates over [this.widget.listItems] and create the apporpriate [ShapedBottomBarItem] widget
+  ///iterates over [this.widget.listItems] and create the appropriate [ShapedBottomBarItem] widget
   ///
   ///this function has no parameter, and has no return value
   void generateListOfWidgets() {
     bottomBarWidgets = [];
     for (ShapedItemObject item in widget.listItems) {
-      if (widget.listItems.indexOf(item) == selectedIndex) {
-        bottomBarWidgets.add(
-          ShapedBottomBarItem(
-            icon: item.iconData,
-            renderWithText: false,
-            themeColor: widget.selectedIconColor,
-          ),
-        );
-      } else {
-        bottomBarWidgets.add(
-          ShapedBottomBarItem(
-            icon: item.iconData,
-            text: item.title ?? '',
-            themeColor: widget.iconsColor,
-            renderWithText: item.title != null,
-            textStyle: widget.textStyle,
-          ),
-        );
-      }
+      bottomBarWidgets.add(
+        ShapedBottomBarItem(
+          icon: item.icon,
+          text: item.title ?? '',
+          isSelected: widget.listItems.indexOf(item) == selectedIndex,
+          selectedColor: widget.selectedIconColor,
+          unselectedColor: widget.unselectedIconColor,
+          textStyle: widget.textStyle,
+        ),
+      );
     }
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shaped_bottom_bar/utils/arrays.dart';
+import 'package:shaped_bottom_bar/utils/enums.dart';
 import 'dart:math' as math;
 
 /// Render an animated widget based on the animation type given and with
@@ -9,14 +9,14 @@ class AnimatedShape extends StatelessWidget {
   AnimatedShape({
     Key? key,
     required this.shape,
-    this.animationType = ANIMATION_TYPE.none,
+    this.animationType = AnimationType.none,
     this.animationValue = 1,
     this.animationOffset,
     this.animationController,
   }) : super(key: key) {
-    if (animationType == ANIMATION_TYPE.slideVertically) {
+    if (animationType == AnimationType.slideVertically) {
       assert(animationOffset != null);
-    } else if (animationType == ANIMATION_TYPE.rotate) {
+    } else if (animationType == AnimationType.rotate) {
       assert(animationController != null);
     }
   }
@@ -36,17 +36,17 @@ class AnimatedShape extends StatelessWidget {
   ///]
   ///```
   ///
-  final ANIMATION_TYPE animationType;
+  final AnimationType animationType;
 
-  ///Animation value used as an opacity if the animation is [ANIMATION_TYPE.fade]
+  ///Animation value used as an opacity if the animation is [AnimationType.fade]
   ///
   final double animationValue;
 
-  ///Animation offset used if the [animationType] equal [ANIMATION_TYPE.slideVertically]
+  ///Animation offset used if the [animationType] equal [AnimationType.slideVertically]
   ///
   final Animation<Offset>? animationOffset;
 
-  ///Animation controller used if the [animationType] equal [ANIMATION_TYPE.rotate]
+  ///Animation controller used if the [animationType] equal [AnimationType.rotate]
   ///
   final AnimationController? animationController;
 
@@ -57,18 +57,18 @@ class AnimatedShape extends StatelessWidget {
 
   Widget _renderAnimatedShape() {
     switch (animationType) {
-      case ANIMATION_TYPE.fade:
+      case AnimationType.fade:
         return AnimatedOpacity(
           duration: const Duration(milliseconds: 500),
           opacity: animationValue,
           child: shape,
         );
-      case ANIMATION_TYPE.slideVertically:
+      case AnimationType.slideVertically:
         return SlideTransition(
           position: animationOffset!,
           child: shape,
         );
-      case ANIMATION_TYPE.rotate:
+      case AnimationType.rotate:
         return AnimatedBuilder(
           animation: animationController!,
           builder: (_, child) {

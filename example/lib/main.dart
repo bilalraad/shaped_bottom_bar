@@ -1,37 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:shaped_bottom_bar/models/shaped_item_object.dart';
-import 'package:shaped_bottom_bar/utils/arrays.dart';
 import 'package:shaped_bottom_bar/shaped_bottom_bar.dart';
 
-void main() {
-  runApp(MyApp());
-}
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyScreen(),
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const MyScreen(),
     );
   }
 }
 
 class MyScreen extends StatefulWidget {
+  const MyScreen({super.key});
+
   @override
-  _MyScreenState createState() => _MyScreenState();
+  State<MyScreen> createState() => _MyScreenState();
 }
 
 class _MyScreenState extends State<MyScreen> {
   List<Widget> screens = List.generate(
     4,
-    (index) => Container(
-      color: Colors.white,
-    ),
+    (index) => Container(color: Colors.white),
   );
 
   int selectedItem = 0;
@@ -40,40 +36,36 @@ class _MyScreenState extends State<MyScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: ShapedBottomBar(
-        backgroundColor: Colors.black12,
-        iconsColor: Colors.black,
+        backgroundColor: Colors.yellow,
+        unselectedIconColor: Colors.teal,
         listItems: [
           ShapedItemObject(
-            iconData: Icons.alarm,
+            icon: const Icon(Icons.alarm),
             title: 'Alarm',
           ),
           ShapedItemObject(
-            iconData: Icons.menu_book,
+            icon: const Icon(Icons.menu_book),
             title: 'Menu',
           ),
           ShapedItemObject(
-            iconData: Icons.verified_user_rounded,
+            icon: const Icon(Icons.verified_user_rounded),
             title: 'User',
           ),
           ShapedItemObject(
-            iconData: Icons.login,
+            icon: const Icon(Icons.logout),
             title: 'Logout',
           ),
         ],
         onItemChanged: (position) {
-          setState(() {
-            this.selectedItem = position;
-          });
+          setState(() => selectedItem = position);
         },
-        shape: ShapeType.hexagone,
+        shape: ShapeType.circle,
         shapeColor: Colors.pink,
-        selectedIconColor: Colors.white,
-        animationType: ANIMATION_TYPE.fade,
+        selectedIconColor: Colors.tealAccent,
+        animationType: AnimationType.fade,
       ),
-      body: Container(
-        child: Center(
-          child: Text('Shaped Bottom Bar'),
-        ),
+      body: const Center(
+        child: Text('Shaped Bottom Bar'),
       ),
     );
   }

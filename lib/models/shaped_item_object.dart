@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class ShapedItemObject {
   String? title;
-  IconData iconData;
+  Widget icon;
 
-  ShapedItemObject({required this.iconData, this.title});
+  ShapedItemObject({required this.icon, this.title});
 }

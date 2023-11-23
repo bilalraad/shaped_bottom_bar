@@ -1,9 +1,9 @@
 enum ShapeType {
   none,
   square,
-  hexagone,
+  hexagon,
   circle,
-  triange,
+  triangle,
   rotatedHexagon,
   royalShape,
   pentagon,
@@ -14,7 +14,7 @@ enum ShapeType {
   custom
 }
 
-enum ANIMATION_TYPE {
+enum AnimationType {
   none,
   fade,
   slideVertically,

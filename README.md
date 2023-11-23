@@ -76,7 +76,7 @@ PS: if you are using `customShape` the `shapeColor` parameter won't have any eff
 
 -  `textStyle` the text style you want to have on the items text (color, size, font family...)
 
--  `animationType` attribute of type `ANIMATION_TYPE` let you choose the animation type possible values:
+-  `animationType` attribute of type `AnimationType` let you choose the animation type possible values:
 
 	- NONE
 	- ROTATE
@@ -219,7 +219,7 @@ ShapedBottomBar(
 	shape:  ShapeType.OCATGON,
 	shapeColor:  Colors.black,
 	selectedIconColor:  Colors.white,
-	animationType:  ANIMATION_TYPE.ROTATE,
+	animationType:  AnimationType.ROTATE,
 )
 
 ```
@@ -248,7 +248,7 @@ ShapedBottomBar(
 	shapeColor:  Colors.pink,
 	selectedIconColor:  Colors.white,
 	with3dEffect:  true,
-	animationType:  ANIMATION_TYPE.FADE
+	animationType:  AnimationType.FADE
 ),
 ```
 ![square_with_3D_effect.png](https://github.com/koukibadr/Shaped-Bottom-Bar/blob/main/example/square_with_3D_effect.png?raw=true)

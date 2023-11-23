@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 extension CustomPaintExtension on CustomPaint {
   CustomPaint clone({Widget? child}) {
