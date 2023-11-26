@@ -36,7 +36,7 @@ const double shapedBottomBarSize = 70;
 ///to set a shape use [shape] type of [ShapeType] enum contain 6 different shapes.
 class ShapedBottomBar extends StatefulWidget {
   ShapedBottomBar({
-    Key? key,
+    GlobalKey<ShapedBottomBarState>? key,
     required this.onItemChanged,
     required this.listItems,
     this.height = shapedBottomBarSize,
@@ -104,10 +104,10 @@ class ShapedBottomBar extends StatefulWidget {
   final bool with3dEffect;
 
   @override
-  _ShapedBottomBarState createState() => _ShapedBottomBarState();
+  ShapedBottomBarState createState() => ShapedBottomBarState();
 }
 
-class _ShapedBottomBarState extends State<ShapedBottomBar>
+class ShapedBottomBarState extends State<ShapedBottomBar>
     with TickerProviderStateMixin {
   ///Current selected item index, by default it takes the value of [this.widget.selectedItemIndex]
   ///
