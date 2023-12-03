@@ -139,10 +139,10 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
   void initState() {
     super.initState();
     selectedIndex = widget.selectedItemIndex;
-
     slideController = AnimationController(
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 500),
       vsync: this,
+      animationBehavior: AnimationBehavior.preserve,
     );
     _offsetAnimation =
         Tween<Offset>(begin: Offset.zero, end: const Offset(0, 1.5)).animate(
@@ -153,16 +153,24 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
-
     generateListOfWidgets();
+  }
+
+  @override
+  void dispose() {
+    slideController?.dispose();
+    rotateController?.dispose();
+
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     kSafeHeight = MediaQuery.of(context).padding.bottom;
+    if (kSafeHeight == 0) kSafeHeight = 20;
     return Container(
       width: widget.width ?? MediaQuery.of(context).size.width,
-      height: widget.height * 0.75 + kSafeHeight,
+      height: widget.height * 0.75 + (kSafeHeight == 20 ? 0 : kSafeHeight),
       decoration: BoxDecoration(
         color: Colors.transparent,
         boxShadow: [
@@ -250,14 +258,12 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
         );
         break;
       case AnimationType.slideVertically:
-        slideController!.animateTo(0.4);
-        Timer(
-          const Duration(milliseconds: 100),
-          () {
-            onSelectAction(position);
-            slideController!.animateTo(0);
-          },
-        );
+        slideController!.animateTo(0.5);
+        Future.delayed(const Duration(milliseconds: 50), () {
+          slideController!.animateTo(0);
+          onSelectAction(position);
+        });
+
         break;
       case AnimationType.rotate:
         onSelectAction(position);
@@ -272,6 +278,102 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
     }
   }
 
+  Widget getShapedWidget(Widget baseWidget) {
+    switch (widget.shape) {
+      case ShapeType.circle:
+        return CircleShape(
+          child: baseWidget,
+          background: widget.shapeColor,
+          size: widget.height,
+        );
+      case ShapeType.square:
+        return SquareShape(
+          child: baseWidget,
+          background: widget.shapeColor,
+          with3DEffect: widget.with3dEffect,
+          size: widget.height,
+        );
+
+      case ShapeType.triangle:
+        return TriangleShape(
+          child: baseWidget,
+          background: widget.shapeColor,
+          size: widget.height,
+          render3dEffect: widget.with3dEffect,
+        );
+
+      case ShapeType.hexagon:
+        return HexagonShape(
+          child: baseWidget,
+          background: widget.shapeColor,
+          with3DEffect: widget.with3dEffect,
+        );
+
+      case ShapeType.rotatedHexagon:
+        return RotatedHexagon(
+          child: baseWidget,
+          background: widget.shapeColor,
+          size: widget.height,
+          with3DEffect: widget.with3dEffect,
+        );
+
+      case ShapeType.royalShape:
+        return RoyalShape(
+          child: baseWidget,
+          background: widget.shapeColor,
+          size: widget.height,
+        );
+
+      case ShapeType.pentagon:
+        return PentagonShape(
+          child: baseWidget,
+          background: widget.shapeColor,
+          size: widget.height,
+          with3DEffect: widget.with3dEffect,
+        );
+
+      case ShapeType.star:
+        return StarShape(
+          child: baseWidget,
+          background: widget.shapeColor,
+          size: widget.height,
+        );
+
+      case ShapeType.rhombus:
+        return RhombusShape(
+          child: baseWidget,
+          background: widget.shapeColor,
+          size: widget.height,
+          with3DEffect: widget.with3dEffect,
+        );
+
+      case ShapeType.octagon:
+        return OctagonShape(
+          child: baseWidget,
+          background: widget.shapeColor,
+          size: widget.height,
+          with3DEffect: widget.with3dEffect,
+        );
+
+      case ShapeType.diamond:
+        return DiamondShape(
+          child: baseWidget,
+          background: widget.shapeColor,
+          size: widget.height,
+          with3DEffect: widget.with3dEffect,
+        );
+
+      case ShapeType.custom:
+        return CustomShapeWidget(
+          child: baseWidget,
+          shape: widget.customShape!,
+        );
+
+      default:
+        return baseWidget;
+    }
+  }
+
   ///render the selected widget
   ///based on the parameter [shape] it render the appropriate shape
   ///if shape equals to [ShapeType.none] the selected item will be just a colored icon with the color is [selectedIconColor]
@@ -282,102 +384,7 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
   ///
   ///return a [Widget] type variable.
   Widget renderSelectedItem(Widget baseWidget) {
-    Widget shapedWidget;
-    switch (widget.shape) {
-      case ShapeType.circle:
-        shapedWidget = CircleShape(
-          child: baseWidget,
-          background: widget.shapeColor,
-          size: widget.height,
-        );
-        break;
-      case ShapeType.square:
-        shapedWidget = SquareShape(
-          child: baseWidget,
-          background: widget.shapeColor,
-          with3DEffect: widget.with3dEffect,
-          size: widget.height,
-        );
-        break;
-      case ShapeType.triangle:
-        shapedWidget = TriangleShape(
-          child: baseWidget,
-          background: widget.shapeColor,
-          size: widget.height,
-          render3dEffect: widget.with3dEffect,
-        );
-        break;
-      case ShapeType.hexagon:
-        shapedWidget = HexagonShape(
-          child: baseWidget,
-          background: widget.shapeColor,
-          with3DEffect: widget.with3dEffect,
-        );
-        break;
-      case ShapeType.rotatedHexagon:
-        shapedWidget = RotatedHexagon(
-          child: baseWidget,
-          background: widget.shapeColor,
-          size: widget.height,
-          with3DEffect: widget.with3dEffect,
-        );
-        break;
-      case ShapeType.royalShape:
-        shapedWidget = RoyalShape(
-          child: baseWidget,
-          background: widget.shapeColor,
-          size: widget.height,
-        );
-        break;
-      case ShapeType.pentagon:
-        shapedWidget = PentagonShape(
-          child: baseWidget,
-          background: widget.shapeColor,
-          size: widget.height,
-          with3DEffect: widget.with3dEffect,
-        );
-        break;
-      case ShapeType.star:
-        shapedWidget = StarShape(
-          child: baseWidget,
-          background: widget.shapeColor,
-          size: widget.height,
-        );
-        break;
-      case ShapeType.rhombus:
-        shapedWidget = RhombusShape(
-          child: baseWidget,
-          background: widget.shapeColor,
-          size: widget.height,
-          with3DEffect: widget.with3dEffect,
-        );
-        break;
-      case ShapeType.octagon:
-        shapedWidget = OctagonShape(
-          child: baseWidget,
-          background: widget.shapeColor,
-          size: widget.height,
-          with3DEffect: widget.with3dEffect,
-        );
-        break;
-      case ShapeType.diamond:
-        shapedWidget = DiamondShape(
-          child: baseWidget,
-          background: widget.shapeColor,
-          size: widget.height,
-          with3DEffect: widget.with3dEffect,
-        );
-        break;
-      case ShapeType.custom:
-        shapedWidget = CustomShapeWidget(
-          child: baseWidget,
-          shape: widget.customShape!,
-        );
-        break;
-      default:
-        shapedWidget = baseWidget;
-        break;
-    }
+    final shapedWidget = getShapedWidget(baseWidget);
     return Stack(
       clipBehavior: Clip.none,
       children: [

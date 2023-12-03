@@ -67,6 +67,7 @@ class AnimatedShape extends StatelessWidget {
         return SlideTransition(
           position: animationOffset!,
           child: shape,
+          transformHitTests: false,
         );
       case AnimationType.rotate:
         return AnimatedBuilder(
