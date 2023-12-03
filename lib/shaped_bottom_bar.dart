@@ -218,6 +218,12 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
     );
   }
 
+  void onSelectAction(int position) {
+    widget.onItemChanged(position);
+    selectedIndex = position;
+    generateListOfWidgets();
+  }
+
   ///updates the current selected item index to a new index
   ///triggered on tapping on any unselected widget, play the selected animation transition
   ///and trigger the [onItemChanged] function passed as parameter the the main widget
@@ -232,13 +238,7 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
         Timer(
           const Duration(milliseconds: 100),
           () {
-            widget.onItemChanged(position);
-            setState(
-              () {
-                selectedIndex = position;
-                generateListOfWidgets();
-              },
-            );
+            onSelectAction(position);
             Timer(
               const Duration(milliseconds: 100),
               () => setState(() => opacity = 1),
@@ -251,23 +251,13 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
         Timer(
           const Duration(milliseconds: 100),
           () {
-            widget.onItemChanged(position);
-            setState(() {
-              selectedIndex = position;
-              generateListOfWidgets();
-            });
+            onSelectAction(position);
             slideController!.animateTo(0);
           },
         );
         break;
       case AnimationType.rotate:
-        widget.onItemChanged(position);
-        setState(
-          () {
-            selectedIndex = position;
-            generateListOfWidgets();
-          },
-        );
+        onSelectAction(position);
         rotateController!.forward();
         Timer(
           const Duration(milliseconds: 300),
@@ -275,12 +265,7 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
         );
         break;
       default:
-        setState(
-          () {
-            selectedIndex = position;
-            generateListOfWidgets();
-          },
-        );
+        onSelectAction(position);
     }
   }
 
