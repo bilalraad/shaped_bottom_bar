@@ -133,6 +133,8 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
   ///
   late AnimationController? rotateController;
 
+  double kSafeHeight = 20;
+
   @override
   void initState() {
     super.initState();
@@ -157,9 +159,10 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
 
   @override
   Widget build(BuildContext context) {
+    kSafeHeight = MediaQuery.of(context).padding.bottom;
     return Container(
       width: widget.width ?? MediaQuery.of(context).size.width,
-      height: widget.height * 0.75,
+      height: widget.height * 0.75 + kSafeHeight,
       decoration: BoxDecoration(
         color: Colors.transparent,
         boxShadow: [
@@ -211,7 +214,7 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
     return InkWell(
       onTap: () => onItemSelected(index),
       child: Container(
-        height: (widget.height * 0.75),
+        height: (widget.height * 0.75) + kSafeHeight,
         color: widget.backgroundColor,
         child: item,
       ),
@@ -381,7 +384,7 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
         Align(
           alignment: Alignment.bottomCenter,
           child: Container(
-            height: (widget.height * 0.75),
+            height: (widget.height * 0.75) + kSafeHeight,
             color: widget.backgroundColor,
           ),
         ),
@@ -390,7 +393,7 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
           left: 0,
           right: 0,
           child: SizedBox(
-            height: (widget.height * 0.75),
+            height: (widget.height * 0.75) + kSafeHeight,
             child: AnimatedShape(
               animationType: widget.animationType,
               animationValue: opacity,
