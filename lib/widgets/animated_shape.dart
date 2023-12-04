@@ -5,27 +5,26 @@ import 'dart:math' as math;
 /// Render an animated widget based on the animation type given and with
 /// a given child widget
 ///
-class AnimatedShape extends StatelessWidget {
+class AnimatedShape extends StatefulWidget {
   AnimatedShape({
     Key? key,
     required this.shape,
+    required this.height,
     this.animationType = AnimationType.none,
     this.animationValue = 1,
-    this.animationOffset,
+    // this.animationOffset,
     this.animationController,
   }) : super(key: key) {
-    if (animationType == AnimationType.slideVertically) {
-      assert(animationOffset != null);
-    } else if (animationType == AnimationType.rotate) {
+    if (animationType == AnimationType.rotate) {
       assert(animationController != null);
     }
   }
 
-  ///the shape child that will be wraped with the animated widget
+  ///the shape child that will be wrapped with the animated widget
   ///
   final Widget shape;
 
-  ///aimation that will be set when navigating between navigation bar items
+  ///animation that will be set when navigating between navigation bar items
   ///possible values
   ///```dart
   ///[
@@ -44,44 +43,80 @@ class AnimatedShape extends StatelessWidget {
 
   ///Animation offset used if the [animationType] equal [AnimationType.slideVertically]
   ///
-  final Animation<Offset>? animationOffset;
+  // final Animation<Offset>? animationOffset;
 
   ///Animation controller used if the [animationType] equal [AnimationType.rotate]
   ///
   final AnimationController? animationController;
+  final double height;
+
+  @override
+  State<AnimatedShape> createState() => _AnimatedShapeState();
+}
+
+class _AnimatedShapeState extends State<AnimatedShape>
+    with SingleTickerProviderStateMixin {
+  late AnimationController? slideController;
+  late Animation<double>? _offsetAnimation;
+
+  @override
+  void initState() {
+    slideController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+      animationBehavior: AnimationBehavior.preserve,
+    );
+    _offsetAnimation = Tween<double>(begin: 0, end: -15).animate(
+      CurvedAnimation(parent: slideController!, curve: Curves.ease),
+    );
+
+    slideController!.forward();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return _renderAnimatedShape();
+    return AnimatedBuilder(
+      animation: _offsetAnimation!,
+      builder: (context, child) {
+        return Positioned(
+          top: widget.animationType == AnimationType.slideVertically
+              ? _offsetAnimation!.value
+              : 0,
+          left: 0,
+          right: 0,
+          child: SizedBox(
+            height: widget.height,
+            child: _renderAnimatedShape(),
+          ),
+        );
+      },
+    );
   }
 
   Widget _renderAnimatedShape() {
-    switch (animationType) {
+    switch (widget.animationType) {
       case AnimationType.fade:
         return AnimatedOpacity(
           duration: const Duration(milliseconds: 500),
-          opacity: animationValue,
-          child: shape,
+          opacity: widget.animationValue,
+          child: widget.shape,
         );
       case AnimationType.slideVertically:
-        return SlideTransition(
-          position: animationOffset!,
-          child: shape,
-          transformHitTests: false,
-        );
+        return widget.shape;
       case AnimationType.rotate:
         return AnimatedBuilder(
-          animation: animationController!,
+          animation: widget.animationController!,
           builder: (_, child) {
             return Transform.rotate(
-              angle: animationController!.value * 2 * math.pi,
+              angle: widget.animationController!.value * 2 * math.pi,
               child: child,
             );
           },
-          child: shape,
+          child: widget.shape,
         );
       default:
-        return shape;
+        return widget.shape;
     }
   }
 }

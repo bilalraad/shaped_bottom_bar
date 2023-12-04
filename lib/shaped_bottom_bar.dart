@@ -123,11 +123,9 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
 
   ///the slide animation controller
   ///
-  late AnimationController? slideController;
 
   ///the offset animation used for slide animation
   ///
-  late Animation<Offset>? _offsetAnimation;
 
   ///The rotation animation controller
   ///
@@ -139,15 +137,6 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
   void initState() {
     super.initState();
     selectedIndex = widget.selectedItemIndex;
-    slideController = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-      animationBehavior: AnimationBehavior.preserve,
-    );
-    _offsetAnimation =
-        Tween<Offset>(begin: Offset.zero, end: const Offset(0, 1.5)).animate(
-      CurvedAnimation(parent: slideController!, curve: Curves.ease),
-    );
 
     rotateController = AnimationController(
       vsync: this,
@@ -158,7 +147,6 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
 
   @override
   void dispose() {
-    slideController?.dispose();
     rotateController?.dispose();
 
     super.dispose();
@@ -258,12 +246,10 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
         );
         break;
       case AnimationType.slideVertically:
-        slideController!.animateTo(0.5);
-        Future.delayed(const Duration(milliseconds: 50), () {
-          slideController!.animateTo(0);
-          onSelectAction(position);
-        });
-
+        onSelectAction(position);
+        // Future.delayed(const Duration(milliseconds: 50), () {
+        //   slideController!.animateTo(0);
+        // });
         break;
       case AnimationType.rotate:
         onSelectAction(position);
@@ -395,20 +381,12 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
             color: widget.backgroundColor,
           ),
         ),
-        Positioned(
-          top: -15,
-          left: 0,
-          right: 0,
-          child: SizedBox(
-            height: (widget.height * 0.75) + kSafeHeight,
-            child: AnimatedShape(
-              animationType: widget.animationType,
-              animationValue: opacity,
-              animationOffset: _offsetAnimation,
-              animationController: rotateController,
-              shape: shapedWidget,
-            ),
-          ),
+        AnimatedShape(
+          height: (widget.height * 0.75) + kSafeHeight,
+          animationType: widget.animationType,
+          animationValue: opacity,
+          animationController: rotateController,
+          shape: shapedWidget,
         ),
       ],
     );
