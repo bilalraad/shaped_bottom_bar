@@ -1,7 +1,5 @@
 library shaped_bottom_bar;
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:shaped_bottom_bar/models/shaped_item_object.dart';
 import 'package:shaped_bottom_bar/utils/enums.dart';
@@ -52,7 +50,6 @@ class ShapedBottomBar extends StatefulWidget {
     this.bottomBarTopColor = Colors.white,
     this.backgroundColor = Colors.blue,
     this.customShape,
-    this.animationType = AnimationType.none,
     this.with3dEffect = false,
   }) : super(key: key) {
     if (withRoundCorners) assert(cornerRadius != null);
@@ -96,7 +93,6 @@ class ShapedBottomBar extends StatefulWidget {
   ///]
   ///```
   ///
-  final AnimationType animationType;
 
   ///Whether the selected shape will be rendered with 3D effects
   ///by default it's false
@@ -117,19 +113,11 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
   ///
   late List<Widget> bottomBarWidgets;
 
-  ///Used when animation type set to [fade]
-  ///
-  double opacity = 1;
-
   ///the slide animation controller
   ///
 
   ///the offset animation used for slide animation
   ///
-
-  ///The rotation animation controller
-  ///
-  late AnimationController? rotateController;
 
   double kSafeHeight = 20;
 
@@ -138,18 +126,7 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
     super.initState();
     selectedIndex = widget.selectedItemIndex;
 
-    rotateController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
     generateListOfWidgets();
-  }
-
-  @override
-  void dispose() {
-    rotateController?.dispose();
-
-    super.dispose();
   }
 
   @override
@@ -217,7 +194,7 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
     );
   }
 
-  void onSelectAction(int position) {
+  void onItemSelected(int position) {
     widget.onItemChanged(position);
     selectedIndex = position;
     generateListOfWidgets();
@@ -230,39 +207,6 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
   ///[position]: the position of the new selected item
   ///
   /// has no return value
-  void onItemSelected(int position) {
-    switch (widget.animationType) {
-      case AnimationType.fade:
-        setState(() => opacity = 0);
-        Timer(
-          const Duration(milliseconds: 100),
-          () {
-            onSelectAction(position);
-            Timer(
-              const Duration(milliseconds: 100),
-              () => setState(() => opacity = 1),
-            );
-          },
-        );
-        break;
-      case AnimationType.slideVertically:
-        onSelectAction(position);
-        // Future.delayed(const Duration(milliseconds: 50), () {
-        //   slideController!.animateTo(0);
-        // });
-        break;
-      case AnimationType.rotate:
-        onSelectAction(position);
-        rotateController!.forward();
-        Timer(
-          const Duration(milliseconds: 300),
-          rotateController!.reset,
-        );
-        break;
-      default:
-        onSelectAction(position);
-    }
-  }
 
   Widget getShapedWidget(Widget baseWidget) {
     switch (widget.shape) {
@@ -383,9 +327,6 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
         ),
         AnimatedShape(
           height: (widget.height * 0.75) + kSafeHeight,
-          animationType: widget.animationType,
-          animationValue: opacity,
-          animationController: rotateController,
           shape: shapedWidget,
         ),
       ],

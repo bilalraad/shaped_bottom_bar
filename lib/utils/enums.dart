@@ -13,10 +13,3 @@ enum ShapeType {
   diamond,
   custom
 }
-
-enum AnimationType {
-  none,
-  fade,
-  slideVertically,
-  rotate,
-}

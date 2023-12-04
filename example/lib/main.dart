@@ -62,7 +62,6 @@ class _MyScreenState extends State<MyScreen> {
         shape: ShapeType.circle,
         shapeColor: Colors.pink,
         selectedIconColor: Colors.tealAccent,
-        animationType: AnimationType.fade,
       ),
       body: const Center(
         child: Text('Shaped Bottom Bar'),
