@@ -109,10 +109,6 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
   ///
   late int selectedIndex;
 
-  ///List of widgets that will be displayed in the bottom bar after adding the shape
-  ///
-  late List<Widget> bottomBarWidgets;
-
   ///the slide animation controller
   ///
 
@@ -125,8 +121,6 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
   void initState() {
     super.initState();
     selectedIndex = widget.selectedItemIndex;
-
-    generateListOfWidgets();
   }
 
   @override
@@ -159,6 +153,18 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
   List<Widget> renderBarItems() {
     List<Widget> bottomBarItems = [];
     List<Widget> renderingItems = [];
+    final bottomBarWidgets = widget.listItems
+        .map(
+          (item) => ShapedBottomBarItem(
+            icon: item.icon,
+            text: item.title ?? '',
+            isSelected: widget.listItems.indexOf(item) == selectedIndex,
+            selectedColor: widget.selectedIconColor,
+            unselectedColor: widget.unselectedIconColor,
+            textStyle: widget.textStyle,
+          ),
+        )
+        .toList();
     for (int index = 0; index < bottomBarWidgets.length; index++) {
       final item = bottomBarWidgets[index];
       if (index == selectedIndex) {
@@ -197,7 +203,6 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
   void onItemSelected(int position) {
     widget.onItemChanged(position);
     selectedIndex = position;
-    generateListOfWidgets();
   }
 
   ///updates the current selected item index to a new index
@@ -331,25 +336,5 @@ class ShapedBottomBarState extends State<ShapedBottomBar>
         ),
       ],
     );
-  }
-
-  ///Generate list of [ShapedBottomBarItem] objects, used in rendering the shaped bottom bar
-  ///iterates over [this.widget.listItems] and create the appropriate [ShapedBottomBarItem] widget
-  ///
-  ///this function has no parameter, and has no return value
-  void generateListOfWidgets() {
-    bottomBarWidgets = [];
-    for (ShapedItemObject item in widget.listItems) {
-      bottomBarWidgets.add(
-        ShapedBottomBarItem(
-          icon: item.icon,
-          text: item.title ?? '',
-          isSelected: widget.listItems.indexOf(item) == selectedIndex,
-          selectedColor: widget.selectedIconColor,
-          unselectedColor: widget.unselectedIconColor,
-          textStyle: widget.textStyle,
-        ),
-      );
-    }
   }
 }
